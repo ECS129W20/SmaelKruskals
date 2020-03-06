@@ -55,15 +55,14 @@ def donkeyKong(matrix, sequenceA, sequenceB):
 
     for acidB in sequenceB:
         seqB.append(acidSequence[acidB])
-    print("k3Tild", k3Tilda(seqA, seqB))
     dk = math.sqrt(2 * (1 - k3Tilda(seqA, seqB)))
-    print('dk = ', dk)
+    #print('dk = ', dk)
     return dk
 
 
 def k3Tilda(seqA, seqB):
     final = kay3(seqA, seqB) / math.sqrt((kay3(seqA, seqA) * kay3(seqB, seqB)))
-    print("final", final)
+    #print("final", final)
 
     return final
 
@@ -126,7 +125,7 @@ def main():
     
     orgFiles = ["Seq1.py","Seq2.py","Seq3.py"] #input("enter the names of the files as strings in a list/n appended by .py, such as : ['filename1.py','filename2.py']")
     #orgNames = #input("enter the organism IDs in a list as strings in the same order as you input their sequences previously")
-    #clusterNum = #input("how many clusters do you predict these sequences will group into?")
+    clusterNum = 1 #input("how many clusters do you predict these sequences will group into?")
 
     orgSeqs = []
                        
@@ -145,9 +144,17 @@ def main():
             
     mst = mstTemp.KruskalMST()
 
+    count = 0
+    while count < clusterNum:
+        del mst[-1]
+        count+=1
+
     #clusters = cluster(mst)
-    
-    print(mst)
+
+
+
+
+
     return mst
 
                        
@@ -224,7 +231,7 @@ class Graph:
                 # weight.  If we are not allowed to change the  
                 # given graph, we can create a copy of graph 
         self.graph =  sorted(self.graph,key=lambda item: item[2]) 
-  
+
         parent = [] ; rank = [] 
   
         # Create V subsets with single elements 
@@ -255,11 +262,7 @@ class Graph:
         for result in result: 
             #print str(u) + " -- " + str(v) + " == " + str(weight)
             NIE.append(result)
-        print(NIE)
 
+        return NIE
 
-
-
-
-                    
 
