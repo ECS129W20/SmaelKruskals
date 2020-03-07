@@ -22,6 +22,16 @@ blosum62 = [[3.90294070015052, 0.612698600061261, 0.58830764005965, 0.5446052746
             [0.542611868915233, 0.555965424563688, 0.486030805784542, 0.345683565218847, 0.434203398141003, 0.611094097106686, 0.496467353893267, 0.348714366361603, 1.79790413031311, 0.630388930627921, 0.692059423023677, 0.532179332619096, 0.708364627674993, 2.76938062915766, 0.363521118919126, 0.557520051020311, 0.573156574120723, 2.10980811550359, 9.83220341258545, 0.658038692870502],
             [0.936458396120263, 0.42007231624752, 0.369033853043791, 0.336500141524566, 0.75584405464154, 0.466777931405709, 0.428943129877398, 0.3369549123791, 0.339447441760233, 2.41751209060932, 1.31423572845207, 0.456542719723346, 1.26893679116311, 0.745089737790822, 0.443082983953355, 0.565223766047939, 0.980943004996173, 0.374456331815776, 0.658038692870502, 3.69215640428348]]
 
+#dkGraph = [[0,0.001703562507,0.005540196414,0.003509587464,0.006556515147,0.02125364837,0.0240384787,0.01933298116,0.02101396427],
+#            [0.001703562507,0,0.004843471958,0.003250906107,0.00609030069,0.02083241974,0.02312327731,0.01904210672,0.02009758335],
+#            [0.005540196414,0.004843471958,0,0.004599556135,0.006082008838,0.02082662207,0.02348627674,0.02022247207,0.02022247207],
+#            [0.003509587464,0.003250906107,0.004599556135,0,0.006116903778,0.02082662207,0.02402315152,0.01824807598,0.01985576633],
+#            [0.006556515147,0.00609030069,0.006082008838,0.006116903778,0,0.02182129334,0.02350313912,0.02105072377,0.02061768359],
+#            [0.02125364837,0.02083241974,0.02082662207,0.02082662207,0.02182129334,0,0.01763998823,0.02434596774,0.02532079575],
+#            [0.0240384787,0.02312327731,0.02348627674,0.02402315152,0.02350313912,0.01763998823,0,0.02767982969,0.02369779993],
+#            [0.01933298116,0.01904210672,0.02022247207,0.01824807598,0.02105072377,0.02434596774,0.02767982969,0,0.01663864606],
+#            [0.02101396427,0.02009758335,0.01942220873,0.01985576633,0.02061768359,0.02532079575,0.02369779993,0.01663864606,0]]
+
 import math
 
 def getSeqFile(file_in):
@@ -44,26 +54,24 @@ def getSeqFile(file_in):
 
     return seq
 
-
+#conver to distance
 def donkeyKong(matrix, sequenceA, sequenceB):
     seqA = []
     seqB = []
-
 
     for acidA in sequenceA:
         seqA.append(acidSequence[acidA])
 
     for acidB in sequenceB:
         seqB.append(acidSequence[acidB])
-    print("k3Tild", k3Tilda(seqA, seqB))
     dk = math.sqrt(2 * (1 - k3Tilda(seqA, seqB)))
-    print('dk = ', dk)
+    #print('dk = ', dk)
     return dk
 
-
+#normalize for length
 def k3Tilda(seqA, seqB):
     final = kay3(seqA, seqB) / math.sqrt((kay3(seqA, seqA) * kay3(seqB, seqB)))
-    print("final", final)
+    #print("final", final)
 
     return final
 
@@ -98,7 +106,7 @@ def kay3(seqA, seqB):
     counter = 1
     i = 1
     s = 0
-    while counter <= len(shorter):
+    while counter <= min(10,len(shorter)):
     #while counter <= min(10,len(shorter)):
         
         s = 0
@@ -118,57 +126,67 @@ def kay3(seqA, seqB):
             
         counter += 1
 
-    
     return k3
 
 
 def main():
-    
-    orgFiles = ["Seq1.py","Seq2.py","Seq3.py"] #input("enter the names of the files as strings in a list/n appended by .py, such as : ['filename1.py','filename2.py']")
-    #orgNames = #input("enter the organism IDs in a list as strings in the same order as you input their sequences previously")
-    #clusterNum = #input("how many clusters do you predict these sequences will group into?")
-
+    seqNum = int(input("enter the number of sequences to cluster"))
     orgSeqs = []
-                       
-    for org in orgFiles:
-        orgSeqs.append(getSeqFile(org))
+    orgStings = []
+
+    for i in range(seqNum):
+        orgName = input("enter the name of the organism")
+        orgSeq = input("enter sequence file name")
+        orgSeqs.append(getSeqFile(orgSeq))
+        orgStings.append(orgName)
+
+    #matix = input("enter the file name of the matix to be used")
+    clusterNum = int(input("how many clusters do you want to make?"))
+    clusterNum = clusterNum - 1
+
+
+    print("start watching the star wars or LOTR trillogy")
 
     dkGraph = groupCompare(orgSeqs)
                        
-    #PutDkgraph into a file
+    #PutDkgraph into a graph
                        
     mstTemp = Graph(len(orgSeqs))
                        
     for orgNodeA in range(len(orgSeqs)): 
         for orgNodeB in range(len(orgSeqs)):
             mstTemp.addEdge(orgNodeA,orgNodeB,dkGraph[orgNodeA][orgNodeB])
-            
+
+    #make MST off of graph
     mst = mstTemp.KruskalMST()
 
-    #clusters = cluster(mst)
-    
-    print(mst)
+    #remove Kmax edges
+    count = 0
+    while count < clusterNum:
+        del mst[-1]
+        count+=1
+
     return mst
 
-                       
+#make NxN matrix of
 def groupCompare(orgList):
-                       
-    outer = []
-                       
-    for animalA in orgList:
-        
-        inner = []
-        
-        for animalB in orgList:
-            
-            inner.append(donkeyKong(blosum62,animalA,animalB))
-            
-        outer.append(inner)
-                       
-    return outer
-      
 
-    
+    outer = []
+    animalAindex = 0
+
+
+    for animalA in orgList:
+        inner = []
+
+        for animalB in orgList:
+            dkResult = donkeyKong(blosum62,animalA,animalB)
+            inner.append(dkResult)
+        outer.append(inner)
+        animalAindex+=1
+
+    return outer
+
+#this segent of code was based off of a geeks for gees page link
 from collections import defaultdict 
   
 #Class to represent a graph 
@@ -224,7 +242,7 @@ class Graph:
                 # weight.  If we are not allowed to change the  
                 # given graph, we can create a copy of graph 
         self.graph =  sorted(self.graph,key=lambda item: item[2]) 
-  
+
         parent = [] ; rank = [] 
   
         # Create V subsets with single elements 
@@ -255,11 +273,11 @@ class Graph:
         for result in result: 
             #print str(u) + " -- " + str(v) + " == " + str(weight)
             NIE.append(result)
-        print(NIE)
+
+        return NIE
 
 
 
 
 
-                    
 
